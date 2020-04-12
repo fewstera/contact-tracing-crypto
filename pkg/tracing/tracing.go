@@ -11,10 +11,12 @@ import (
 	"golang.org/x/crypto/hkdf"
 )
 
+// Person represents a single user of contact tracing.
 type Person struct {
 	TracingKey []byte
 }
 
+// GeneratePerson generates a new Person with a random TracingKey
 func GeneratePerson() (Person, error) {
 	tracingKey := make([]byte, 32)
 	_, err := rand.Read(tracingKey)
@@ -29,6 +31,7 @@ func GeneratePerson() (Person, error) {
 	return p, nil
 }
 
+//DailyTracingKey returns the daily tracing key for the given dailyNumber
 func (p Person) DailyTracingKey(dailyNumber uint32) (DailyTracingKey, error) {
 	header := []byte("CT-DTK")
 	dailyNumberBytes := make([]byte, 32)
@@ -47,8 +50,10 @@ func (p Person) DailyTracingKey(dailyNumber uint32) (DailyTracingKey, error) {
 	return dailyTracingKey, nil
 }
 
+// DailyTracingKey is the daily tracing key
 type DailyTracingKey []byte
 
+// ProximityIdentifier returns a proximity indentified for a given time internal number
 func (key DailyTracingKey) ProximityIdentifier(timeIntervalNumber uint8) []byte {
 	header := []byte("CT-RPI")
 	timeIntervalNumberBytes := byte(timeIntervalNumber)

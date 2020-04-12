@@ -30,38 +30,21 @@ func main() {
 		dividedDailyKeys = append(dividedDailyKeys, dailyKeys[i:end])
 	}
 
-	var mux sync.Mutex
 	startTime := time.Now()
-	progress := 0
-	go func() {
-
-		for {
-			mux.Lock()
-			progressPercent := float64(progress) / float64(len(dailyKeys)) * 100
-			mux.Unlock()
-
-			fmt.Printf("Processessing daily keys (%.f%%)\n", progressPercent)
-			time.Sleep(time.Duration(1) * time.Second)
-		}
-	}()
 
 	var wg sync.WaitGroup
 	for _, dKeys := range dividedDailyKeys {
 		wg.Add(1)
 
-		go func(dKeys []tracing.DailyTracingKey, progress *int) {
+		go func(dKeys []tracing.DailyTracingKey) {
 			// Generate proximity tokens for each daily key
 			for _, dailyKey := range dKeys {
-				mux.Lock()
-				*progress = *progress + 1
-				mux.Unlock()
-
 				for i := 0; i < 143; i++ {
 					dailyKey.ProximityIdentifier(uint8(i))
 				}
 			}
 			wg.Done()
-		}(dKeys, &progress)
+		}(dKeys)
 	}
 
 	wg.Wait()
