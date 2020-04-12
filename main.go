@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"runtime"
+	"sync"
 	"time"
 
 	"github.com/fewstera/contact-tracing-crypto/pkg/tracing"
@@ -15,23 +17,54 @@ func main() {
 		panic(fmt.Errorf("Error generating daily keys: %w", err))
 	}
 
+	dividedDailyKeys := [][]tracing.DailyTracingKey{}
+	numProcesses := runtime.NumCPU()
+	chunkSize := (len(dailyKeys) + numProcesses - 1) / numProcesses
+	for i := 0; i < len(dailyKeys); i += chunkSize {
+		end := i + chunkSize
+
+		if end > len(dailyKeys) {
+			end = len(dailyKeys)
+		}
+
+		dividedDailyKeys = append(dividedDailyKeys, dailyKeys[i:end])
+	}
+
+	var mux sync.Mutex
 	startTime := time.Now()
 	progress := 0
 	go func() {
+
 		for {
+			mux.Lock()
 			progressPercent := float64(progress) / float64(len(dailyKeys)) * 100
+			mux.Unlock()
+
 			fmt.Printf("Processessing daily keys (%.f%%)\n", progressPercent)
 			time.Sleep(time.Duration(1) * time.Second)
 		}
 	}()
 
-	// Generate proximity tokens for each daily key
-	for x, dailyKey := range dailyKeys {
-		progress = x
-		for i := 0; i < 143; i++ {
-			dailyKey.ProximityIdentifier(uint8(i))
-		}
+	var wg sync.WaitGroup
+	for _, dKeys := range dividedDailyKeys {
+		wg.Add(1)
+
+		go func(dKeys []tracing.DailyTracingKey, progress *int) {
+			// Generate proximity tokens for each daily key
+			for _, dailyKey := range dKeys {
+				mux.Lock()
+				*progress = *progress + 1
+				mux.Unlock()
+
+				for i := 0; i < 143; i++ {
+					dailyKey.ProximityIdentifier(uint8(i))
+				}
+			}
+			wg.Done()
+		}(dKeys, &progress)
 	}
+
+	wg.Wait()
 
 	duration := time.Now().Sub(startTime)
 	fmt.Printf("Took %.2f seconds\n", float64(duration.Milliseconds())/1000)
