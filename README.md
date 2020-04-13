@@ -18,8 +18,14 @@ I wanted to test how long it would take to generate proximity keys for a list of
 
 I assumed that 81,000 new people would be infected and for each infected person the daily keys for the past 14 days would be published.
 
+#### On a Macbook Pro
 I ran the test on my 2019 Macbook Pro (Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz).
 
 When running on all CPUs it takes around 28 seconds to generate all of the proximity keys.
 
 When running on a single processor it took around 120 seconds.
+
+#### On an iPhone Xs
+Running the same test on my iPhone Xs took 122 seconds.
+
+To run the test I compiled the Go files into an iOS framework, then imported the framework and ran the App on my device.
