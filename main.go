@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	numberOfPeople := 50000
-	numberOfKeysPerPerson := 10
+	numberOfPeople := 81000
+	numberOfKeysPerPerson := 14
 	dailyKeys, err := generateDailyKeysForPeople(numberOfPeople, numberOfKeysPerPerson)
 	if err != nil {
 		panic(fmt.Errorf("Error generating daily keys: %w", err))
@@ -39,9 +39,7 @@ func main() {
 		go func(dKeys []tracing.DailyTracingKey) {
 			// Generate proximity tokens for each daily key
 			for _, dailyKey := range dKeys {
-				for i := 0; i < 143; i++ {
-					dailyKey.ProximityIdentifier(uint8(i))
-				}
+				dailyKey.AllProximityIdentifiers()
 			}
 			wg.Done()
 		}(dKeys)

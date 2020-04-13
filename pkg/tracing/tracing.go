@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"crypto/rand"
-	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
+
+	"github.com/minio/sha256-simd"
 
 	"golang.org/x/crypto/hkdf"
 )
@@ -53,7 +54,7 @@ func (p Person) DailyTracingKey(dailyNumber uint32) (DailyTracingKey, error) {
 // DailyTracingKey is the daily tracing key
 type DailyTracingKey []byte
 
-// ProximityIdentifier returns a proximity indentified for a given time internal number
+// ProximityIdentifier returns a proximity identifier for a given time interval number
 func (key DailyTracingKey) ProximityIdentifier(timeIntervalNumber uint8) []byte {
 	header := []byte("CT-RPI")
 	timeIntervalNumberBytes := byte(timeIntervalNumber)
@@ -65,4 +66,20 @@ func (key DailyTracingKey) ProximityIdentifier(timeIntervalNumber uint8) []byte 
 	proximityIdentifier := h.Sum(nil)
 
 	return proximityIdentifier[:16]
+}
+
+// AllProximityIdentifiers returns all proximity identifiers for a given daily tracing key
+func (key DailyTracingKey) AllProximityIdentifiers() [][]byte {
+	h := hmac.New(sha256.New, key)
+	header := []byte("CT-RPI")
+	proximityIdentifiers := [][]byte{}
+
+	for i := 0; i < 144; i++ {
+		timeIntervalNumberBytes := []byte{uint8(i)}
+		h.Write(bytes.Join([][]byte{header, timeIntervalNumberBytes}, nil))
+
+		proximityIdentifiers = append(proximityIdentifiers, h.Sum(nil)[:16])
+	}
+
+	return proximityIdentifiers
 }

@@ -10,16 +10,16 @@ I wanted to test how long it would take to generate proximity keys for a list of
 ### Findings
 > **Please note:**
 > 
-> ⚠️ The number of infected people and the number of daily keys uploaded per person were chosen at random.
+> ⚠️ The number of infected people and the number of daily keys uploaded per person were not chosen using scientific methods.
 >
-> ⚠️ This implementation is not the most efficient
+> ⚠️ This implementation is not the most efficient.
 >
 > ⚠️ The implementation may not be correct, I believe I've followed the specification, but I can't find any examples to test against.
 
-I assumed that 50,000 new people would be infected and for each infected person the daily keys for the past 10 days would be published.
+I assumed that 81,000 new people would be infected and for each infected person the daily keys for the past 14 days would be published.
 
-I ran the test on my 2019 Macbook Pro (2.6 GHz 6-Core Intel Core i7).
+I ran the test on my 2019 Macbook Pro (Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz).
 
-When running on a single processor it took around 80 seconds to generate all of the proximity keys.
+When running on a single processor it took around 102 seconds to generate all of the proximity keys.
 
-When running on all CPUs (12) it takes around 20 seconds.
+When running on all CPUs it takes around 23 seconds.
