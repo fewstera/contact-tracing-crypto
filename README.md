@@ -20,6 +20,6 @@ I assumed that 81,000 new people would be infected and for each infected person 
 
 I ran the test on my 2019 Macbook Pro (Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz).
 
-When running on a single processor it took around 102 seconds to generate all of the proximity keys.
+When running on all CPUs it takes around 28 seconds to generate all of the proximity keys.
 
-When running on all CPUs it takes around 23 seconds.
+When running on a single processor it took around 120 seconds.

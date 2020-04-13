@@ -79,6 +79,7 @@ func (key DailyTracingKey) AllProximityIdentifiers() [][]byte {
 		h.Write(bytes.Join([][]byte{header, timeIntervalNumberBytes}, nil))
 
 		proximityIdentifiers = append(proximityIdentifiers, h.Sum(nil)[:16])
+		h.Reset()
 	}
 
 	return proximityIdentifiers
